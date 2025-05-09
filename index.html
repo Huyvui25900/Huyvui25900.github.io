@@ -1,103 +1,139 @@
-
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <title>Quản lý Nick TikTok</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="css/bootstrap.min.css">
-    <style>
-        body { background: #f4f6f9; font-family: Arial; padding: 20px; }
-        .container { max-width: 750px; margin: auto; }
-        .btn { width: 100%; margin-bottom: 10px; }
-        .card { margin-top: 20px; }
-        .account-box { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; position: relative; }
-        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .label-title { font-weight: bold; }
-        .index-number { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #888; font-size: 14px; }
-        .copy-btn { font-size: 11px; padding: 2px 6px; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Trình Quản Lý Nick TikTok</title>
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <style>
+    body {
+      background: linear-gradient(135deg, #f3f4f7, #ffffff);
+      font-family: 'Segoe UI', sans-serif;
+      padding: 30px;
+    }
+    .container {
+      max-width: 850px;
+      margin: auto;
+    }
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    .card {
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      border: none;
+      border-radius: 10px;
+    }
+    .account-box {
+      background: #fff;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 15px 20px;
+      margin-bottom: 15px;
+      position: relative;
+    }
+    .label-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 5px;
+      gap: 10px;
+    }
+    .label-title {
+      font-weight: bold;
+      color: #333;
+    }
+    .copy-btn {
+      font-size: 11px;
+      padding: 2px 6px;
+    }
+    .index-number {
+      position: absolute;
+      top: 5px;
+      right: 15px;
+      font-size: 13px;
+      color: #888;
+      font-weight: bold;
+    }
+    .footer-link {
+      text-align: right;
+      margin-top: 10px;
+    }
+  </style>
 </head>
 <body>
 <div class="container">
-    <button class="btn btn-secondary" onclick="location.reload();">🔄 Tải lại trang</button>
+  <div class="header">
+    <h3>📋 Quản Lý Tài Khoản TikTok</h3>
+    <p>Hệ thống tự động tách nick theo định dạng: <code>user | pass | email + mã</code></p>
+  </div>
 
-    <div class="card">
-        <div class="card-header">⚙️ Cài đặt hệ thống</div>
-        <div class="card-body">
-            <input type="file" id="fileInput" accept=".txt" class="form-control">
-            <small class="form-text text-muted mt-2">Hệ thống sẽ tách theo dạng: user | pass | email + mã xác minh...</small>
-        </div>
+  <div class="card mb-4">
+    <div class="card-body">
+      <label for="fileInput" class="form-label">Tải file tài khoản (.txt):</label>
+      <input type="file" id="fileInput" accept=".txt" class="form-control">
     </div>
+  </div>
 
-    <div class="card">
-        <div class="card-header">📄 Danh sách tài khoản</div>
-        <div class="card-body" id="accountList">
-            <p>Chưa có dữ liệu. Vui lòng chọn file .txt bên trên.</p>
-        </div>
+  <div class="card">
+    <div class="card-header bg-primary text-white">Danh sách tài khoản</div>
+    <div class="card-body" id="accountList">
+      <p class="text-muted">Vui lòng tải file để xem danh sách.</p>
     </div>
+  </div>
 </div>
 
 <script>
 function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Đã sao chép: " + text);
-    });
+  navigator.clipboard.writeText(text).then(() => alert("Đã sao chép: " + text));
 }
 
 function parseAccounts(rawText) {
-    const regex = /(\S+?)\|(.*?)\|([^\n]+)/g;
-    let match;
-    const results = [];
-    while ((match = regex.exec(rawText)) !== null) {
-        results.push({
-            user: match[1],
-            pass: match[2],
-            emailFull: match[3]
-        });
-    }
-    return results;
+  const regex = /(\S+?)\|(.*?)\|([^\n]+)/g;
+  let match, results = [];
+  while ((match = regex.exec(rawText)) !== null) {
+    results.push({ user: match[1], pass: match[2], email: match[3] });
+  }
+  return results;
 }
 
 function renderAccounts(rawText) {
-    const accounts = parseAccounts(rawText);
-    const container = document.getElementById('accountList');
-    container.innerHTML = '';
-    if (accounts.length === 0) {
-        container.innerHTML = '<p>Không tìm thấy tài khoản hợp lệ.</p>';
-        return;
-    }
-    accounts.forEach((acc, index) => {
-        const html = `
-            <div class="account-box">
-                <div class="index-number">#${index + 1}</div>
-                <div class="label-row"><span class="label-title">🧾 Tài khoản:</span> ${acc.user}
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.user}')">📋</button></div>
-                <div class="label-row"><span class="label-title">🔑 Mật khẩu:</span> ${acc.pass}
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.pass}')">📋</button></div>
-                <div class="label-row"><span class="label-title">📧 Email:</span> ${acc.emailFull}
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.emailFull}')">📋</button></div>
-                <a href="https://dongvanfb.net/read_mail_box/" target="_blank">📬 Đọc mail ➜</a>
-            </div>
-        `;
-        container.innerHTML += html;
-    });
+  const accounts = parseAccounts(rawText);
+  const container = document.getElementById("accountList");
+  container.innerHTML = "";
+  if (!accounts.length) {
+    container.innerHTML = "<p class='text-danger'>Không tìm thấy tài khoản hợp lệ.</p>";
+    return;
+  }
+  accounts.forEach((acc, index) => {
+    container.innerHTML += `
+      <div class="account-box">
+        <div class="index-number">#${index + 1}</div>
+        <div class="label-row"><span class="label-title">🧾 Tài khoản:</span> ${acc.user}
+          <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.user}')">📋</button></div>
+        <div class="label-row"><span class="label-title">🔑 Mật khẩu:</span> ${acc.pass}
+          <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.pass}')">📋</button></div>
+        <div class="label-row"><span class="label-title">📧 Email:</span> ${acc.email}
+          <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.email}')">📋</button></div>
+        <div class="footer-link"><a href="https://dongvanfb.net/read_mail_box/" target="_blank">📬 Đọc mail ➜</a></div>
+      </div>`;
+  });
 }
 
-document.getElementById('fileInput').addEventListener('change', function(evt) {
-    const file = evt.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function(e) {
-        localStorage.setItem('account_data', e.target.result);
-        renderAccounts(e.target.result);
-    };
-    reader.readAsText(file);
+document.getElementById("fileInput").addEventListener("change", function(evt) {
+  const file = evt.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    localStorage.setItem("account_data", e.target.result);
+    renderAccounts(e.target.result);
+  };
+  reader.readAsText(file);
 });
 
-window.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem('account_data');
-    if (saved) renderAccounts(saved);
+window.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem("account_data");
+  if (saved) renderAccounts(saved);
 });
 </script>
 </body>
