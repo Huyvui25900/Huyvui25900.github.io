@@ -8,27 +8,29 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
         body { background: #f4f6f9; font-family: Arial; padding: 20px; }
-        .container { max-width: 600px; margin: auto; }
+        .container { max-width: 700px; margin: auto; }
         .btn { width: 100%; margin-bottom: 10px; }
         .card { margin-top: 20px; }
-        pre { white-space: pre-wrap; word-break: break-word; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        .account-box { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
+        .copy-btn { margin-left: 10px; font-size: 12px; }
     </style>
 </head>
 <body>
 <div class="container">
     <button class="btn btn-secondary" onclick="location.reload();">🔄 Tải lại trang</button>
+
     <div class="card">
         <div class="card-header">⚙️ Cài đặt hệ thống</div>
         <div class="card-body">
             <input type="file" id="fileInput" accept=".txt" class="form-control">
-            <small class="form-text text-muted mt-2">Chọn file .txt chứa danh sách tài khoản (mỗi dòng: user | pass | email)</small>
+            <small class="form-text text-muted mt-2">Chọn file .txt chứa nick (dòng: email | pass | chuỗi phía sau...)</small>
         </div>
     </div>
 
     <div class="card">
         <div class="card-header">📄 Danh sách tài khoản</div>
-        <div class="card-body">
-            <pre id="output">Chưa có dữ liệu. Vui lòng chọn file .txt bên trên.</pre>
+        <div class="card-body" id="accountList">
+            <p>Chưa có dữ liệu. Vui lòng chọn file .txt bên trên.</p>
         </div>
     </div>
 </div>
@@ -40,14 +42,46 @@ document.getElementById('fileInput').addEventListener('change', function(evt) {
     const reader = new FileReader();
     reader.onload = function(e) {
         localStorage.setItem('account_data', e.target.result);
-        document.getElementById('output').textContent = e.target.result;
+        renderAccounts(e.target.result);
     };
     reader.readAsText(file);
 });
 
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Đã sao chép: " + text);
+    });
+}
+
+function renderAccounts(text) {
+    const lines = text.split('\n');
+    const container = document.getElementById('accountList');
+    container.innerHTML = '';
+    lines.forEach((line) => {
+        const parts = line.trim().split('|');
+        if (parts.length >= 3) {
+            const email = parts[0];
+            const pass = parts[1];
+            const extra = parts.slice(2).join('|');
+            const html = `
+                <div class="account-box">
+                    <strong>🧾 Tài khoản:</strong> <span>${email}</span>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${email}')">Sao chép</button><br>
+                    <strong>🔑 Mật khẩu:</strong> <span>${pass}</span>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${pass}')">Sao chép</button><br>
+                    <strong>📧 Email:</strong> <span>${extra}</span>
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${extra}')">Sao chép</button><br>
+                    <a href="https://dongvanfb.net/read_mail_box/" target="_blank">📬 Đọc mail ➜</a>
+                </div>
+            `;
+            container.innerHTML += html;
+        }
+    });
+}
+
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('account_data');
-    if (saved) document.getElementById('output').textContent = saved;
+    if (saved) renderAccounts(saved);
 });
 </script>
 </body>
