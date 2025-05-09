@@ -1,207 +1,54 @@
-<!DOCTYPE html><html lang="en"><head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trang ch�</title>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Quản lý Nick TikTok</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="css/bootstrap.min.css">
-    <link rel="stylesheet" href="css/site.css">
-    <link rel="stylesheet" href="css/ZZZC_PRO.styles.css">
+    <style>
+        body { background: #f4f6f9; font-family: Arial; padding: 20px; }
+        .container { max-width: 600px; margin: auto; }
+        .btn { width: 100%; margin-bottom: 10px; }
+        .card { margin-top: 20px; }
+        pre { white-space: pre-wrap; word-break: break-word; background: #fff; padding: 15px; border: 1px solid #ddd; border-radius: 4px; }
+    </style>
 </head>
 <body>
-    <main b-uzrcq8a87h="" role="main" class="container">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="css/modern-style.css">
-<link rel="stylesheet" href="css/all.min.css">
+<div class="container">
+    <button class="btn btn-secondary" onclick="location.reload();">🔄 Tải lại trang</button>
+    <div class="card">
+        <div class="card-header">⚙️ Cài đặt hệ thống</div>
+        <div class="card-body">
+            <input type="file" id="fileInput" accept=".txt" class="form-control">
+            <small class="form-text text-muted mt-2">Chọn file .txt chứa danh sách tài khoản (mỗi dòng: user | pass | email)</small>
+        </div>
+    </div>
 
-<div class="container mt-4">
-
-
-  <!-- Nút Tải lại trang -->
-  <div class="mb-3">
-      <button type="button" class="btn btn-reload" style="width:100%;" onclick="location.reload();">
-          <i class="fas fa-sync-alt"></i> Tải lại trang
-      </button>
-  </div>
-
-  <!-- Nút Cài đặt Hệ thống -->
-  <div class="mb-3">
-      <a href="/Settings" class="btn btn-settings w-100">
-          <i class="fas fa-cog"></i> Cài đặt Hệ thống
-      </a>
-  </div>
-
-  <!-- Hiển thị các phần theo thứ tự đã sắp xếp -->
-                                                  <div class="card mb-3">
-                                                      <div class="card-header">
-                                                          <i class="fas fa-user"></i> Tài Khoản
-                                                      </div>
-                                                      <div class="card-body">
-                                                                          <p class="empty-message">Chưa có tài khoản nào được lấy.</p>
-
-                                                          <!-- Nút Lấy Tài khoản và Yêu cầu kích tài khoản -->
-                                                          <div class="d-flex flex-column align-items-center mt-3">
-                                                              <a href="/Home/GetAccount" class="btn btn-primary w-100 mb-2">
-                                                                  <i class="fas fa-download"></i> Lấy Tài khoản
-                                                              </a>
-
-                                                                              <button class="btn btn-accent w-100" disabled="">
-                                                                                  <i class="fas fa-user-check"></i> Yêu cầu kích điểm
-                                                                              </button>
-                                                          </div>
-                                                      </div>
-                                                  </div>
-                                                  <div class="card mb-3">
-                                                      <div class="card-header">
-                                                          <i class="fas fa-film"></i> Xem Video
-                                                      </div>
-                                                      <div class="card-body">
-                                                                          <p class="empty-message">Chưa có video nào. Vui lòng thêm video trước.</p>
-                                                      </div>
-                                                  </div>
-                                                  <div class="card mb-3">
-                                                      <div class="card-header">
-                                                          <i class="fas fa-envelope"></i> Email Rút tiền nhanh
-                                                      </div>
-                                                      <div class="card-body">
-                                                          <div class="input-group mb-1">
-                                                              <input id="randomEmail" type="text" class="form-control" value="f3a8mf2tq0@son2771.fun" readonly="">
-                                                              <button class="btn btn-copy" type="button" onclick="copyText('randomEmail')">
-                                                                  <i class="fas fa-copy"></i>
-                                                              </button>
-                                                          </div>
-                                                          <span id="feedback-randomEmail" class="copy-feedback">Đã copy!</span>
-                                                      </div>
-                                                  </div>
-                                                  <div class="card mb-3">
-                                                      <div class="card-header">
-                                                          <i class="fas fa-cloud"></i> Thông tin iCloud
-                                                      </div>
-                                                      <div class="card-body">
-                                                                          <p class="empty-message">Chưa có thông tin iCloud. <a href="/Settings">Cài đặt ngay</a></p>
-                                                      </div>
-                                                  </div>
+    <div class="card">
+        <div class="card-header">📄 Danh sách tài khoản</div>
+        <div class="card-body">
+            <pre id="output">Chưa có dữ liệu. Vui lòng chọn file .txt bên trên.</pre>
+        </div>
+    </div>
 </div>
 
+<script>
+document.getElementById('fileInput').addEventListener('change', function(evt) {
+    const file = evt.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        localStorage.setItem('account_data', e.target.result);
+        document.getElementById('output').textContent = e.target.result;
+    };
+    reader.readAsText(file);
+});
 
-    </main>
-
-    <script src="js/jquery.min.js"></script>
-    <script src="js/bootstrap.bundle.min.js"></script>
-    <script src="js/site.js"></script>
-    
-              <script>
-                  function copyText(elementId) {
-                      var copyText = document.getElementById(elementId);
-                      copyText.select();
-                      copyText.setSelectionRange(0, 99999); // hỗ trợ cho mobile
-                      document.execCommand("copy");
-                      var feedback = document.getElementById("feedback-" + elementId);
-                      feedback.style.display = "block";
-                      setTimeout(function(){
-                          feedback.style.display = "none";
-                      }, 2000);
-                  }
-
-                  document.addEventListener("DOMContentLoaded", function() {
-                      // Xử lý sự kiện click cho nút Get Code
-                      var getCodeBtn = document.getElementById('getCodeBtn');
-                      if (getCodeBtn) {
-                          getCodeBtn.addEventListener('click', function() {
-                              // Hiển thị khu vực kết quả và loading
-                              document.getElementById('codeResult').style.display = 'block';
-                              document.getElementById('codeLoading').style.display = 'flex';
-                              document.getElementById('codeData').style.display = 'none';
-                              document.getElementById('codeError').style.display = 'none';
-
-                              // Thu thập dữ liệu tài khoản
-                              var accountData = [];
-                              var i = 0;
-                              var element = document.getElementById('accountData' + i);
-                              while (element) {
-                                  accountData.push(element.value);
-                                  i++;
-                                  element = document.getElementById('accountData' + i);
-                              }
-
-                              // Gửi dữ liệu để phân tích
-                              fetch('/Home/AnalyzeAccountData', {
-                                  method: 'POST',
-                                  headers: {
-                                      'Content-Type': 'application/json',
-                                  },
-                                  body: JSON.stringify(accountData)
-                              })
-                              .then(response => response.json())
-                              .then(data => {
-                                  // Kiểm tra xem có đủ dữ liệu không
-                                  if (!data.email || !data.refreshToken || !data.clientId) {
-                                      throw new Error('Không tìm thấy đủ thông tin cần thiết trong dữ liệu tài khoản. Cần có email, refresh token và client ID.');
-                                  }
-
-                                  // Gửi yêu cầu lấy code
-                                  return fetch('/Home/GetCode', {
-                                      method: 'POST',
-                                      headers: {
-                                          'Content-Type': 'application/json',
-                                      },
-                                      body: JSON.stringify({
-                                          email: data.email,
-                                          refreshToken: data.refreshToken,
-                                          clientId: data.clientId
-                                      })
-                                  });
-                              })
-                              .then(response => response.json())
-                              .then(data => {
-                                  // Ẩn loading
-                                  document.getElementById('codeLoading').style.display = 'none';
-
-                                  // Hiển thị dữ liệu
-                                  var codeDataElement = document.getElementById('codeData');
-                                  codeDataElement.style.display = 'block';
-
-                                  if (data.status === true) {
-                                      // Hiển thị thông tin code
-                                      var html = `
-                                          <div class="success-message">Lấy code thành công!</div>
-                                          <div class="mb-2">
-                                              <label>Code:</label>
-                                              <div class="input-group mb-1">
-                                                  <input id="resultCode" type="text" class="form-control" value="${data.code}" readonly>
-                                                  <button class="btn btn-copy" type="button" onclick="copyText('resultCode')">
-                                                      <i class="fas fa-copy"></i>
-                                                  </button>
-                                              </div>
-                                              <span id="feedback-resultCode" class="copy-feedback">Đã copy!</span>
-                                          </div>
-                                          <div class="mb-2">
-                                              <label>Content:</label>
-                                              <div class="input-group mb-1">
-                                                  <input id="resultContent" type="text" class="form-control" value="${data.content}" readonly>
-                                                  <button class="btn btn-copy" type="button" onclick="copyText('resultContent')">
-                                                      <i class="fas fa-copy"></i>
-                                                  </button>
-                                              </div>
-                                              <span id="feedback-resultContent" class="copy-feedback">Đã copy!</span>
-                                          </div>
-                                      `;
-                                      codeDataElement.innerHTML = html;
-                                  } else {
-                                      // Hiển thị thông báo lỗi
-                                      document.getElementById('codeError').style.display = 'block';
-                                      document.getElementById('codeError').textContent = data.message || 'Không thể lấy code. Vui lòng thử lại sau.';
-                                  }
-                              })
-                              .catch(error => {
-                                  // Ẩn loading và hiển thị lỗi
-                                  document.getElementById('codeLoading').style.display = 'none';
-                                  document.getElementById('codeError').style.display = 'block';
-                                  document.getElementById('codeError').textContent = error.message || 'Đã xảy ra lỗi. Vui lòng thử lại sau.';
-                              });
-                          });
-                      }
-                  });
-              </script>
-
-
-
-</body></html>
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem('account_data');
+    if (saved) document.getElementById('output').textContent = saved;
+});
+</script>
+</body>
+</html>
