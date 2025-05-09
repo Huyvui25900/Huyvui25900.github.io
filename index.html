@@ -8,11 +8,14 @@
     <link rel="stylesheet" href="css/bootstrap.min.css">
     <style>
         body { background: #f4f6f9; font-family: Arial; padding: 20px; }
-        .container { max-width: 700px; margin: auto; }
+        .container { max-width: 750px; margin: auto; }
         .btn { width: 100%; margin-bottom: 10px; }
         .card { margin-top: 20px; }
-        .account-box { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; }
-        .copy-btn { margin-left: 10px; font-size: 12px; }
+        .account-box { background: #fff; border: 1px solid #ddd; padding: 15px; border-radius: 5px; margin-bottom: 15px; position: relative; }
+        .label-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
+        .label-title { font-weight: bold; }
+        .index-number { position: absolute; top: 5px; right: 10px; font-weight: bold; color: #888; font-size: 14px; }
+        .copy-btn { font-size: 11px; padding: 2px 6px; }
     </style>
 </head>
 <body>
@@ -23,7 +26,7 @@
         <div class="card-header">⚙️ Cài đặt hệ thống</div>
         <div class="card-body">
             <input type="file" id="fileInput" accept=".txt" class="form-control">
-            <small class="form-text text-muted mt-2">Chọn file .txt chứa nick (dòng: email | pass | chuỗi phía sau...)</small>
+            <small class="form-text text-muted mt-2">Hệ thống sẽ tách theo dạng: user | pass | email + mã xác minh...</small>
         </div>
     </div>
 
@@ -36,6 +39,51 @@
 </div>
 
 <script>
+function copyToClipboard(text) {
+    navigator.clipboard.writeText(text).then(() => {
+        alert("Đã sao chép: " + text);
+    });
+}
+
+function parseAccounts(rawText) {
+    const regex = /(\S+?)\|(.*?)\|([^\n]+)/g;
+    let match;
+    const results = [];
+    while ((match = regex.exec(rawText)) !== null) {
+        results.push({
+            user: match[1],
+            pass: match[2],
+            emailFull: match[3]
+        });
+    }
+    return results;
+}
+
+function renderAccounts(rawText) {
+    const accounts = parseAccounts(rawText);
+    const container = document.getElementById('accountList');
+    container.innerHTML = '';
+    if (accounts.length === 0) {
+        container.innerHTML = '<p>Không tìm thấy tài khoản hợp lệ.</p>';
+        return;
+    }
+    accounts.forEach((acc, index) => {
+        const html = `
+            <div class="account-box">
+                <div class="index-number">#${index + 1}</div>
+                <div class="label-row"><span class="label-title">🧾 Tài khoản:</span> ${acc.user}
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.user}')">📋</button></div>
+                <div class="label-row"><span class="label-title">🔑 Mật khẩu:</span> ${acc.pass}
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.pass}')">📋</button></div>
+                <div class="label-row"><span class="label-title">📧 Email:</span> ${acc.emailFull}
+                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${acc.emailFull}')">📋</button></div>
+                <a href="https://dongvanfb.net/read_mail_box/" target="_blank">📬 Đọc mail ➜</a>
+            </div>
+        `;
+        container.innerHTML += html;
+    });
+}
+
 document.getElementById('fileInput').addEventListener('change', function(evt) {
     const file = evt.target.files[0];
     if (!file) return;
@@ -46,38 +94,6 @@ document.getElementById('fileInput').addEventListener('change', function(evt) {
     };
     reader.readAsText(file);
 });
-
-function copyToClipboard(text) {
-    navigator.clipboard.writeText(text).then(() => {
-        alert("Đã sao chép: " + text);
-    });
-}
-
-function renderAccounts(text) {
-    const lines = text.split('\n');
-    const container = document.getElementById('accountList');
-    container.innerHTML = '';
-    lines.forEach((line) => {
-        const parts = line.trim().split('|');
-        if (parts.length >= 3) {
-            const email = parts[0];
-            const pass = parts[1];
-            const extra = parts.slice(2).join('|');
-            const html = `
-                <div class="account-box">
-                    <strong>🧾 Tài khoản:</strong> <span>${email}</span>
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${email}')">Sao chép</button><br>
-                    <strong>🔑 Mật khẩu:</strong> <span>${pass}</span>
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${pass}')">Sao chép</button><br>
-                    <strong>📧 Email:</strong> <span>${extra}</span>
-                    <button class="btn btn-sm btn-outline-primary copy-btn" onclick="copyToClipboard('${extra}')">Sao chép</button><br>
-                    <a href="https://dongvanfb.net/read_mail_box/" target="_blank">📬 Đọc mail ➜</a>
-                </div>
-            `;
-            container.innerHTML += html;
-        }
-    });
-}
 
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem('account_data');
